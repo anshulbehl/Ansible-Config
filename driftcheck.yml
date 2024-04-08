@@ -4,7 +4,6 @@
   strategy: free
 
   tasks:
-
     - name: Linux Setup
       ansible.builtin.include_role:
         name: shadowman_linux_setup

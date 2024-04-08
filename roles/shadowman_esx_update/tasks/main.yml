@@ -1,5 +1,4 @@
 ---
-
 - name: ESXi enter maintenance
   community.vmware.vmware_maintenancemode:
     esxi_hostname: "{{ inventory_hostname }}"

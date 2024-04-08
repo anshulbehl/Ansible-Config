@@ -1,7 +1,7 @@
 ---
 - name: Upgrade all packages (yum)
   ansible.builtin.yum:
-    name: '*'
+    name: "*"
     state: latest
     exclude: "{{ exclude_packages }}"
     update_only: true
@@ -26,7 +26,7 @@
 
 - name: Upgrade all packages (dnf)
   ansible.builtin.dnf:
-    name: '*'
+    name: "*"
     state: latest
     exclude: "{{ exclude_packages }}"
     update_only: true

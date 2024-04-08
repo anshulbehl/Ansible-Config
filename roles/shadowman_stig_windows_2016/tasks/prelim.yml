@@ -6,23 +6,23 @@
 # + ~~~~~~~
 #     + CategoryInfo          : NotSpecified: (:) [Get-Tpm], TpmWmiException
 #     + FullyQualifiedErrorId : Microsoft.Tpm.Commands.TpmWmiException,Microsoft.Tpm.Commands.GetTpmCommand
-- name: "PRELIM | Detect if Trusted Platform Module (TPM) is available"
+- name: PRELIM | Detect if Trusted Platform Module (TPM) is available
   ansible.windows.win_shell: (Get-CimInstance -ClassName Win32_OperatingSystem).ProductType
   register: win2016_tpm_enabled
-  changed_when: no
-  failed_when: no
+  changed_when: false
+  failed_when: false
   check_mode: false
   tags:
-      - always
+    - always
 
 # 1 = disabled 0 = enabled
 # this reg key may be useful detect is secure conenctions enabled, etc?
-- name: "PRELIM | Detect if Remote Desktop Services (RDP) is enabled"
+- name: PRELIM | Detect if Remote Desktop Services (RDP) is enabled
   ansible.windows.win_reg_stat:
-      path: HKLM:\System\CurrentControlSet\Control\Terminal Server
-      name: fDenyTSConnections
+    path: HKLM:\System\CurrentControlSet\Control\Terminal Server
+    name: fDenyTSConnections
   register: win2016_rdp_enabled
-  changed_when: no
-  failed_when: no
+  changed_when: false
+  failed_when: false
   tags:
-      - always
+    - always

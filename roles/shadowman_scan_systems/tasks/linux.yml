@@ -1,5 +1,4 @@
 ---
-
 - name: Scan packages (Unix/Linux)
   ansible.builtin.package_facts:
   register: result

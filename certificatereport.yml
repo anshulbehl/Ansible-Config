@@ -6,7 +6,6 @@
     - shadowman_cert_check
 
   tasks:
-
     - name: Build the report
       ansible.builtin.include_role:
         name: shadowman.reports.build_report_certs

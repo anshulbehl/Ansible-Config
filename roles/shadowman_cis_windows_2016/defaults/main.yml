@@ -11,21 +11,21 @@ min_ansible_version: "2.6"
 # We've defined complexity-high to mean that we cannot automatically remediate
 # the rule in question.  In the future this might mean that the remediation
 # may fail in some cases.
-complexity_high: no
+complexity_high: false
 
 # Show "changed" for complex items not remediated per complexity-high setting
 # to make them stand out.  "changed" items on a second run of the role would
 # indicate items requiring manual review.
-audit_complex: yes
+audit_complex: true
 
 # We've defined disruption-high to indicate items that are likely to cause
 # disruption in a normal workflow.  These items can be remediated automatically
 # but are disabled by default to avoid disruption.
-disruption_high: no
+disruption_high: false
 
 # Show "changed" for disruptive items not remediated per disruption-high
 # setting to make them stand out.
-audit_disruptive: yes
+audit_disruptive: true
 
 skip_for_travis: false
 
@@ -33,7 +33,7 @@ workaround_for_disa_benchmark: true
 workaround_for_ssg_benchmark: true
 
 # tweak role to run in a non-privileged container
-system_is_container: no
+system_is_container: false
 
 # set to false to skip tasks that either have not been developed or cannot be automated
 is_implemented: false
@@ -480,31 +480,30 @@ newadministratorname: ansibleadmin
 newguestname: ansibleguest
 
 legalnoticetext: |
-    You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.
+  You are accessing a U.S. Government (USG) Information System (IS) that is provided for USG-authorized use only.
 
-    By using this IS (which includes any device attached to this IS), you consent to the following conditions:
+  By using this IS (which includes any device attached to this IS), you consent to the following conditions:
 
-    -The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.
+  -The USG routinely intercepts and monitors communications on this IS for purposes including, but not limited to, penetration testing, COMSEC monitoring, network operations and defense, personnel misconduct (PM), law enforcement (LE), and counterintelligence (CI) investigations.
 
-    -At any time, the USG may inspect and seize data stored on this IS.
+  -At any time, the USG may inspect and seize data stored on this IS.
 
-    -Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.
+  -Communications using, or data stored on, this IS are not private, are subject to routine monitoring, interception, and search, and may be disclosed or used for any USG-authorized purpose.
 
-    -This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.
+  -This IS includes security measures (e.g., authentication and access controls) to protect USG interests--not for your personal benefit or privacy.
 
-    -Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.
+  -Notwithstanding the above, using this IS does not constitute consent to PM, LE or CI investigative searching or monitoring of the content of privileged communications, or work product, related to personal representation or services by attorneys, psychotherapists, or clergy, and their assistants. Such communications and work product are private and confidential. See User Agreement for details.
 
 app_maxsize: 32768
 sec_maxsize: 196608
 sys_maxsize: 32768
 
-
-legalnoticecaption: "DoD Notice and Consent Banner"
+legalnoticecaption: DoD Notice and Consent Banner
 
 # 9.1.5
 # domain_firewall_log_path is the path to the domain firewall log files. The control suggests %SystemRoot%\System32\logfiles\firewall\domainfw.log
 # This is a variable to give some leway on where to store these log files
-domain_firewall_log_path: '%SystemRoot%\System32\logfiles\firewall\domainfw.log'
+domain_firewall_log_path: "%SystemRoot%\\System32\\logfiles\\firewall\\domainfw.log"
 
 # 9.1.6
 # domain_firewall_log_size is the size of the log file generated
@@ -514,7 +513,7 @@ domain_firewall_log_size: 16,384
 # 9.2.5
 # private_firewall_log_path is the path to the private firewall log files. The control suggests %SystemRoot%\System32\logfiles\firewall\privatefw.log
 # This is a variable to give some leway on where to store these log files
-private_firewall_log_path: '%SystemRoot%\System32\logfiles\firewall\privatefw.log'
+private_firewall_log_path: "%SystemRoot%\\System32\\logfiles\\firewall\\privatefw.log"
 
 # 9.2.6
 # private_firewall_log_size is the size of the log file
@@ -524,13 +523,12 @@ private_firewall_log_size: 16,384
 # 9.3.7
 # public_firewall_log_path is the path to the public firewall log file. The control suggests %SystemRoot%\System32\logfiles\firewall\publicfw.log
 # This is a variable to give some leway on where to store these log files
-public_firewall_log_path: '%SystemRoot%\System32\logfiles\firewall\publicfw.log'
+public_firewall_log_path: "%SystemRoot%\\System32\\logfiles\\firewall\\publicfw.log"
 
 # 9.3.8
 # public_firewall_log_size is the size of the log file
 # To conform to CIS stadnards the value should be 16,384 or greater. Value is in KB
 public_firewall_log_size: 16,384
-
 
 # 18.9.102.2
 # win16cis_wupdate_options are described below

@@ -87,13 +87,11 @@
     - no_reboot_needed
     - package_crypto-policies_installed
 
-
-
 - name: Configure System Cryptography Policy
   ansible.builtin.lineinfile:
     path: /etc/crypto-policies/config
     regexp: ^(?!#)(\S+)$
-    line: '{{ var_system_crypto_policy }}'
+    line: "{{ var_system_crypto_policy }}"
     create: true
   tags:
     - CCE-80935-0
@@ -539,7 +537,7 @@
     dest: /etc/dnf/automatic.conf
     section: commands
     option: apply_updates
-    value: 'yes'
+    value: "yes"
     create: true
   tags:
     - CCE-82494-6
@@ -637,8 +635,7 @@
     create: false
   when:
     - '"yum" in ansible_facts.packages'
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution
-      == "Scientific" or yum_config_file.stat.exists)
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Scientific" or yum_config_file.stat.exists)
   tags:
     - CCE-80790-9
     - CJIS-5.10.4.1
@@ -748,8 +745,7 @@
     create: true
   when:
     - '"yum" in ansible_facts.packages'
-    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution
-      == "Scientific" or yum_config_file.stat.exists)
+    - (ansible_distribution == "RedHat" or ansible_distribution == "CentOS" or ansible_distribution == "Scientific" or yum_config_file.stat.exists)
   tags:
     - CCE-80791-7
     - DISA-STIG-RHEL-08-010371
@@ -825,13 +821,12 @@
 
 - name: Set gpgcheck=1 for each yum repo
   community.general.ini_file:
-    path: '{{ item[0] }}'
-    section: '{{ item[1] }}'
+    path: "{{ item[0] }}"
+    section: "{{ item[1] }}"
     option: gpgcheck
-    value: '1'
+    value: "1"
     no_extra_spaces: true
-  loop: '{{ repo_grep_results.stdout | regex_findall( ''(.+\.repo):\[(.+)\]\n?'' )
-    }}'
+  loop: "{{ repo_grep_results.stdout | regex_findall( '(.+\\.repo):\\[(.+)\\]\\n?' ) }}"
   tags:
     - CCE-80792-5
     - CJIS-5.10.4.1
@@ -945,8 +940,7 @@
     key: /etc/pki/rpm-gpg/RPM-GPG-KEY-redhat-release
   when:
     - gpg_key_directory_permission.stat.mode <= '0755'
-    - (gpg_installed_fingerprints | difference(gpg_valid_fingerprints)) | length ==
-      0
+    - (gpg_installed_fingerprints | difference(gpg_valid_fingerprints)) | length == 0
     - gpg_installed_fingerprints | length > 0
     - ansible_distribution == "RedHat"
   tags:
@@ -968,7 +962,6 @@
 
 - name: Enable timer dnf-automatic
   block:
-
     - name: Gather the package facts
       ansible.builtin.package_facts:
         manager: auto
@@ -976,7 +969,7 @@
     - name: Enable timer dnf-automatic
       ansible.builtin.systemd:
         name: dnf-automatic.timer
-        enabled: 'yes'
+        enabled: "yes"
         state: started
       when:
         - '"dnf-automatic" in ansible_facts.packages'
@@ -1008,7 +1001,6 @@
     - medium_disruption
     - medium_severity
     - no_reboot_needed
-
 
 - name: Do not allow users to reuse recent passwords - system-auth (change)
   ansible.builtin.replace:
@@ -1068,18 +1060,16 @@
     - no_reboot_needed
     - restrict_strategy
 
-
 - name: Add auth pam_faillock preauth deny before pam_unix.so
   community.general.pamd:
-    name: '{{ item }}'
+    name: "{{ item }}"
     type: auth
     control: sufficient
     module_path: pam_unix.so
     new_type: auth
     new_control: required
     new_module_path: pam_faillock.so
-    module_arguments: preauth silent deny={{ var_accounts_passwords_pam_faillock_deny
-      }}
+    module_arguments: preauth silent deny={{ var_accounts_passwords_pam_faillock_deny }}
     state: before
   loop:
     - system-auth
@@ -1102,12 +1092,11 @@
 
 - name: Add deny argument to auth pam_faillock preauth
   community.general.pamd:
-    name: '{{ item }}'
+    name: "{{ item }}"
     type: auth
     control: required
     module_path: pam_faillock.so
-    module_arguments: preauth silent deny={{ var_accounts_passwords_pam_faillock_deny
-      }}
+    module_arguments: preauth silent deny={{ var_accounts_passwords_pam_faillock_deny }}
     state: args_present
   loop:
     - system-auth
@@ -1130,12 +1119,12 @@
 
 - name: Add auth pam_faillock authfail deny after pam_unix.so
   community.general.pamd:
-    name: '{{ item }}'
+    name: "{{ item }}"
     type: auth
     control: sufficient
     module_path: pam_unix.so
     new_type: auth
-    new_control: '[default=die]'
+    new_control: "[default=die]"
     new_module_path: pam_faillock.so
     module_arguments: authfail deny={{ var_accounts_passwords_pam_faillock_deny }}
     state: after
@@ -1160,10 +1149,10 @@
 
 - name: Add deny argument to auth pam_faillock authfail
   community.general.pamd:
-    name: '{{ item }}'
+    name: "{{ item }}"
     type: auth
     new_type: auth
-    control: '[default=die]'
+    control: "[default=die]"
     module_path: pam_faillock.so
     module_arguments: authfail deny={{ var_accounts_passwords_pam_faillock_deny }}
     state: args_present
@@ -1188,7 +1177,7 @@
 
 - name: Add account pam_faillock before pam_unix.so
   community.general.pamd:
-    name: '{{ item }}'
+    name: "{{ item }}"
     type: account
     control: required
     module_path: pam_unix.so
@@ -1230,18 +1219,16 @@
     - no_reboot_needed
     - restrict_strategy
 
-
 - name: Add auth pam_faillock preauth fail_interval before pam_unix.so
   community.general.pamd:
-    name: '{{ item }}'
+    name: "{{ item }}"
     type: auth
     control: sufficient
     module_path: pam_unix.so
     new_type: auth
     new_control: required
     new_module_path: pam_faillock.so
-    module_arguments: preauth silent fail_interval={{ var_accounts_passwords_pam_faillock_fail_interval
-      }}
+    module_arguments: preauth silent fail_interval={{ var_accounts_passwords_pam_faillock_fail_interval }}
     state: before
   loop:
     - system-auth
@@ -1261,12 +1248,11 @@
 
 - name: Add fail_interval argument to auth pam_faillock preauth
   community.general.pamd:
-    name: '{{ item }}'
+    name: "{{ item }}"
     type: auth
     control: required
     module_path: pam_faillock.so
-    module_arguments: preauth silent fail_interval={{ var_accounts_passwords_pam_faillock_fail_interval
-      }}
+    module_arguments: preauth silent fail_interval={{ var_accounts_passwords_pam_faillock_fail_interval }}
     state: args_present
   loop:
     - system-auth
@@ -1286,15 +1272,14 @@
 
 - name: Add auth pam_faillock aufthfail fail_interval after pam_unix.so
   community.general.pamd:
-    name: '{{ item }}'
+    name: "{{ item }}"
     type: auth
     control: sufficient
     module_path: pam_unix.so
     new_type: auth
-    new_control: '[default=die]'
+    new_control: "[default=die]"
     new_module_path: pam_faillock.so
-    module_arguments: authfail fail_interval={{ var_accounts_passwords_pam_faillock_fail_interval
-      }}
+    module_arguments: authfail fail_interval={{ var_accounts_passwords_pam_faillock_fail_interval }}
     state: after
   loop:
     - system-auth
@@ -1314,12 +1299,11 @@
 
 - name: Add fail_interval argument to auth pam_faillock authfail
   community.general.pamd:
-    name: '{{ item }}'
+    name: "{{ item }}"
     type: auth
-    control: '[default=die]'
+    control: "[default=die]"
     module_path: pam_faillock.so
-    module_arguments: authfail fail_interval={{ var_accounts_passwords_pam_faillock_fail_interval
-      }}
+    module_arguments: authfail fail_interval={{ var_accounts_passwords_pam_faillock_fail_interval }}
     state: args_present
   loop:
     - system-auth
@@ -1339,7 +1323,7 @@
 
 - name: Add account pam_faillock before pam_unix.so
   community.general.pamd:
-    name: '{{ item }}'
+    name: "{{ item }}"
     type: account
     control: required
     module_path: pam_unix.so
@@ -1381,18 +1365,16 @@
     - no_reboot_needed
     - restrict_strategy
 
-
 - name: Add auth pam_faillock preauth unlock_time before pam_unix.so
   community.general.pamd:
-    name: '{{ item }}'
+    name: "{{ item }}"
     type: auth
     control: sufficient
     module_path: pam_unix.so
     new_type: auth
     new_control: required
     new_module_path: pam_faillock.so
-    module_arguments: preauth silent unlock_time={{ var_accounts_passwords_pam_faillock_unlock_time
-      }}
+    module_arguments: preauth silent unlock_time={{ var_accounts_passwords_pam_faillock_unlock_time }}
     state: before
   loop:
     - system-auth
@@ -1415,12 +1397,11 @@
 
 - name: Add unlock_time argument to pam_faillock preauth
   community.general.pamd:
-    name: '{{ item }}'
+    name: "{{ item }}"
     type: auth
     control: required
     module_path: pam_faillock.so
-    module_arguments: preauth silent unlock_time={{ var_accounts_passwords_pam_faillock_unlock_time
-      }}
+    module_arguments: preauth silent unlock_time={{ var_accounts_passwords_pam_faillock_unlock_time }}
     state: args_present
   loop:
     - system-auth
@@ -1443,15 +1424,14 @@
 
 - name: Add auth pam_faillock authfail unlock_interval after pam_unix.so
   community.general.pamd:
-    name: '{{ item }}'
+    name: "{{ item }}"
     type: auth
     control: sufficient
     module_path: pam_unix.so
     new_type: auth
-    new_control: '[default=die]'
+    new_control: "[default=die]"
     new_module_path: pam_faillock.so
-    module_arguments: authfail unlock_time={{ var_accounts_passwords_pam_faillock_unlock_time
-      }}
+    module_arguments: authfail unlock_time={{ var_accounts_passwords_pam_faillock_unlock_time }}
     state: after
   loop:
     - system-auth
@@ -1474,12 +1454,11 @@
 
 - name: Add unlock_time argument to auth pam_faillock authfail
   community.general.pamd:
-    name: '{{ item }}'
+    name: "{{ item }}"
     type: auth
-    control: '[default=die]'
+    control: "[default=die]"
     module_path: pam_faillock.so
-    module_arguments: authfail unlock_time={{ var_accounts_passwords_pam_faillock_unlock_time
-      }}
+    module_arguments: authfail unlock_time={{ var_accounts_passwords_pam_faillock_unlock_time }}
     state: args_present
   loop:
     - system-auth
@@ -1502,7 +1481,7 @@
 
 - name: Add account pam_faillock before pam_unix.so
   community.general.pamd:
-    name: '{{ item }}'
+    name: "{{ item }}"
     type: account
     control: required
     module_path: pam_unix.so
@@ -1546,7 +1525,6 @@
     - medium_severity
     - no_reboot_needed
     - restrict_strategy
-
 
 - name: Ensure PAM variable dcredit is set accordingly
   ansible.builtin.lineinfile:
@@ -1588,7 +1566,6 @@
     - no_reboot_needed
     - restrict_strategy
 
-
 - name: Ensure PAM variable difok is set accordingly
   ansible.builtin.lineinfile:
     create: true
@@ -1629,7 +1606,6 @@
     - no_reboot_needed
     - restrict_strategy
 
-
 - name: Ensure PAM variable lcredit is set accordingly
   ansible.builtin.lineinfile:
     create: true
@@ -1669,7 +1645,6 @@
     - no_reboot_needed
     - restrict_strategy
 
-
 - name: Ensure PAM variable maxclassrepeat is set accordingly
   ansible.builtin.lineinfile:
     create: true
@@ -1706,7 +1681,6 @@
     - medium_severity
     - no_reboot_needed
     - restrict_strategy
-
 
 - name: Ensure PAM variable maxrepeat is set accordingly
   ansible.builtin.lineinfile:
@@ -1746,7 +1720,6 @@
     - medium_severity
     - no_reboot_needed
     - restrict_strategy
-
 
 - name: Ensure PAM variable minlen is set accordingly
   ansible.builtin.lineinfile:
@@ -1788,7 +1761,6 @@
     - no_reboot_needed
     - restrict_strategy
 
-
 - name: Ensure PAM variable ocredit is set accordingly
   ansible.builtin.lineinfile:
     create: true
@@ -1828,7 +1800,6 @@
     - no_reboot_needed
     - restrict_strategy
 
-
 - name: Ensure PAM variable ucredit is set accordingly
   ansible.builtin.lineinfile:
     create: true
@@ -1853,16 +1824,15 @@
 
 - name: Disable service debug-shell
   block:
-
     - name: Gather the service facts
-      ansible.builtin.service_facts: null
+      ansible.builtin.service_facts:
 
     - name: Disable service debug-shell
       ansible.builtin.systemd:
         name: debug-shell.service
-        enabled: 'no'
+        enabled: "no"
         state: stopped
-        masked: 'yes'
+        masked: "yes"
       when: '"debug-shell.service" in ansible_facts.services'
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
@@ -1897,9 +1867,9 @@
 - name: Disable socket debug-shell
   ansible.builtin.systemd:
     name: debug-shell.socket
-    enabled: 'no'
+    enabled: "no"
     state: stopped
-    masked: 'yes'
+    masked: "yes"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - '"debug-shell.socket" in socket_file_exists.stdout_lines[1]'
@@ -2065,7 +2035,6 @@
 
 - name: Configure tmux to lock session after inactivity
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/tmux.conf
@@ -2104,7 +2073,6 @@
 
 - name: Configure the tmux Lock Command
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/tmux.conf
@@ -2161,7 +2129,6 @@
     - medium_severity
     - no_reboot_needed
     - restrict_strategy
-
 
 - name: Set Password Minimum Length in login.defs
   ansible.builtin.lineinfile:
@@ -2278,12 +2245,11 @@
     - no_reboot_needed
     - restrict_strategy
 
-
 - name: Find /etc/security/limits.d files containing maxlogins configuration
   ansible.builtin.find:
     paths: /etc/security/limits.d
     contains: ^[\s]*\*[\s]+(?:(?:hard)|(?:-))[\s]+maxlogins
-    patterns: '*.conf'
+    patterns: "*.conf"
   register: maxlogins
   when: '"pam" in ansible_facts.packages'
   tags:
@@ -2299,15 +2265,13 @@
     - no_reboot_needed
     - restrict_strategy
 
-- name: Limit the Number of Concurrent Login Sessions Allowed Per User in files from
-    limits.d
+- name: Limit the Number of Concurrent Login Sessions Allowed Per User in files from limits.d
   ansible.builtin.replace:
-    dest: '{{ item.path }}'
+    dest: "{{ item.path }}"
     regexp: ^#?\*.*maxlogins.*
-    replace: '*          hard    maxlogins     {{ var_accounts_max_concurrent_login_sessions
-      }}'
+    replace: "*          hard    maxlogins     {{ var_accounts_max_concurrent_login_sessions }}"
   with_items:
-    - '{{ maxlogins.files }}'
+    - "{{ maxlogins.files }}"
   when: '"pam" in ansible_facts.packages'
   tags:
     - CCE-80955-8
@@ -2328,8 +2292,7 @@
     dest: /etc/security/limits.conf
     insertbefore: ^# End of file
     regexp: ^#?\*.*maxlogins
-    line: '*          hard    maxlogins     {{ var_accounts_max_concurrent_login_sessions
-      }}'
+    line: "*          hard    maxlogins     {{ var_accounts_max_concurrent_login_sessions }}"
     create: true
   when:
     - '"pam" in ansible_facts.packages'
@@ -2346,8 +2309,6 @@
     - low_severity
     - no_reboot_needed
     - restrict_strategy
-
-
 
 - name: Set user umask in /etc/bashrc
   ansible.builtin.replace:
@@ -2366,8 +2327,6 @@
     - no_reboot_needed
     - restrict_strategy
 
-
-
 - name: Set user umask in /etc/csh.cshrc
   ansible.builtin.replace:
     path: /etc/csh.cshrc
@@ -2383,8 +2342,6 @@
     - no_reboot_needed
     - restrict_strategy
     - unknown_severity
-
-
 
 - name: Set user umask in /etc/profile
   ansible.builtin.replace:
@@ -2467,7 +2424,6 @@
 
 - name: Enable service auditd
   block:
-
     - name: Gather the package facts
       ansible.builtin.package_facts:
         manager: auto
@@ -2475,9 +2431,9 @@
     - name: Enable service auditd
       ansible.builtin.service:
         name: auditd
-        enabled: 'yes'
+        enabled: "yes"
         state: started
-        masked: 'no'
+        masked: "no"
       when:
         - '"audit" in ansible_facts.packages'
   when:
@@ -2557,15 +2513,13 @@
 
 - name: Update the bootloader menu
   ansible.builtin.command: /usr/bin/grub2-editenv - set "{{ item }} audit=1"
-  with_items: '{{ kernelopts.stdout_lines | select(''match'', ''^kernelopts.*'') |
-    list }}'
+  with_items: "{{ kernelopts.stdout_lines | select('match', '^kernelopts.*') | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - '"grub2-common" in ansible_facts.packages'
     - kernelopts.stdout_lines is defined
     - kernelopts.stdout_lines | length > 0
-    - kernelopts.stdout | regex_search('^kernelopts=(?:.*\s)?audit=1(?:\s.*)?$', multiline=True)
-      is none
+    - kernelopts.stdout | regex_search('^kernelopts=(?:.*\s)?audit=1(?:\s.*)?$', multiline=True) is none
   tags:
     - CCE-80825-3
     - CJIS-5.4.1.1
@@ -2620,15 +2574,13 @@
 
 - name: Update the bootloader menu
   ansible.builtin.command: /usr/bin/grub2-editenv - set "{{ item }} audit_backlog_limit=8192"
-  with_items: '{{ kernelopts.stdout_lines | select(''match'', ''^kernelopts.*'') |
-    list }}'
+  with_items: "{{ kernelopts.stdout_lines | select('match', '^kernelopts.*') | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - '"grub2-common" in ansible_facts.packages'
     - kernelopts.stdout_lines is defined
     - kernelopts.stdout_lines | length > 0
-    - kernelopts.stdout | regex_search('^kernelopts=(?:.*\s)?audit_backlog_limit=8192(?:\s.*)?$',
-      multiline=True) is none
+    - kernelopts.stdout | regex_search('^kernelopts=(?:.*\s)?audit_backlog_limit=8192(?:\s.*)?$', multiline=True) is none
   tags:
     - CCE-80943-4
     - DISA-STIG-RHEL-08-030602
@@ -2654,7 +2606,6 @@
     - medium_severity
     - no_reboot_needed
     - restrict_strategy
-
 
 - name: Configure auditd Flush Priority
   ansible.builtin.lineinfile:
@@ -2690,7 +2641,6 @@
 
 - name: Set number of records to cause an explicit flush to audit logs
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/audit/auditd.conf
@@ -2741,7 +2691,6 @@
 
 - name: Include Local Events in Audit Logs
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/audit/auditd.conf
@@ -2793,7 +2742,6 @@
 
 - name: Resolve information before writing to audit logs
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/audit/auditd.conf
@@ -2845,7 +2793,6 @@
 
 - name: Set hostname as computer node name in audit logs
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/audit/auditd.conf
@@ -2896,7 +2843,6 @@
 
 - name: Write Audit Logs to the Disk
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/audit/auditd.conf
@@ -2932,8 +2878,7 @@
     - no_reboot_needed
     - restrict_strategy
 
-- name: Put contents into /etc/audit/rules.d/30-ospp-v42-3-access-failed.rules according
-    to policy
+- name: Put contents into /etc/audit/rules.d/30-ospp-v42-3-access-failed.rules according to policy
   ansible.builtin.copy:
     dest: /etc/audit/rules.d/30-ospp-v42-3-access-failed.rules
     content: |
@@ -2970,8 +2915,7 @@
     - no_reboot_needed
     - restrict_strategy
 
-- name: Put contents into /etc/audit/rules.d/30-ospp-v42-3-access-success.rules according
-    to policy
+- name: Put contents into /etc/audit/rules.d/30-ospp-v42-3-access-success.rules according to policy
   ansible.builtin.copy:
     dest: /etc/audit/rules.d/30-ospp-v42-3-access-success.rules
     content: |
@@ -3051,8 +2995,7 @@
     - no_reboot_needed
     - restrict_strategy
 
-- name: Put contents into /etc/audit/rules.d/30-ospp-v42-1-create-failed.rules according
-    to policy
+- name: Put contents into /etc/audit/rules.d/30-ospp-v42-1-create-failed.rules according to policy
   ansible.builtin.copy:
     dest: /etc/audit/rules.d/30-ospp-v42-1-create-failed.rules
     content: |
@@ -3097,8 +3040,7 @@
     - no_reboot_needed
     - restrict_strategy
 
-- name: Put contents into /etc/audit/rules.d/30-ospp-v42-1-create-success.rules according
-    to policy
+- name: Put contents into /etc/audit/rules.d/30-ospp-v42-1-create-success.rules according to policy
   ansible.builtin.copy:
     dest: /etc/audit/rules.d/30-ospp-v42-1-create-success.rules
     content: |
@@ -3137,8 +3079,7 @@
     - no_reboot_needed
     - restrict_strategy
 
-- name: Put contents into /etc/audit/rules.d/30-ospp-v42-4-delete-failed.rules according
-    to policy
+- name: Put contents into /etc/audit/rules.d/30-ospp-v42-4-delete-failed.rules according to policy
   ansible.builtin.copy:
     dest: /etc/audit/rules.d/30-ospp-v42-4-delete-failed.rules
     content: |
@@ -3175,8 +3116,7 @@
     - no_reboot_needed
     - restrict_strategy
 
-- name: Put contents into /etc/audit/rules.d/30-ospp-v42-4-delete-success.rules according
-    to policy
+- name: Put contents into /etc/audit/rules.d/30-ospp-v42-4-delete-success.rules according to policy
   ansible.builtin.copy:
     dest: /etc/audit/rules.d/30-ospp-v42-4-delete-success.rules
     content: |
@@ -3247,8 +3187,7 @@
     - no_reboot_needed
     - restrict_strategy
 
-- name: Put contents into /etc/audit/rules.d/30-ospp-v42-2-modify-failed.rules according
-    to policy
+- name: Put contents into /etc/audit/rules.d/30-ospp-v42-2-modify-failed.rules according to policy
   ansible.builtin.copy:
     dest: /etc/audit/rules.d/30-ospp-v42-2-modify-failed.rules
     content: |
@@ -3293,8 +3232,7 @@
     - no_reboot_needed
     - restrict_strategy
 
-- name: Put contents into /etc/audit/rules.d/30-ospp-v42-2-modify-success.rules according
-    to policy
+- name: Put contents into /etc/audit/rules.d/30-ospp-v42-2-modify-success.rules according to policy
   ansible.builtin.copy:
     dest: /etc/audit/rules.d/30-ospp-v42-2-modify-success.rules
     content: |
@@ -3482,8 +3420,7 @@
     - no_reboot_needed
     - restrict_strategy
 
-- name: Put contents into /etc/audit/rules.d/30-ospp-v42-6-owner-change-failed.rules
-    according to policy
+- name: Put contents into /etc/audit/rules.d/30-ospp-v42-6-owner-change-failed.rules according to policy
   ansible.builtin.copy:
     dest: /etc/audit/rules.d/30-ospp-v42-6-owner-change-failed.rules
     content: |
@@ -3520,8 +3457,7 @@
     - no_reboot_needed
     - restrict_strategy
 
-- name: Put contents into /etc/audit/rules.d/30-ospp-v42-6-owner-change-success.rules
-    according to policy
+- name: Put contents into /etc/audit/rules.d/30-ospp-v42-6-owner-change-success.rules according to policy
   ansible.builtin.copy:
     dest: /etc/audit/rules.d/30-ospp-v42-6-owner-change-success.rules
     content: |
@@ -3556,8 +3492,7 @@
     - no_reboot_needed
     - restrict_strategy
 
-- name: Put contents into /etc/audit/rules.d/30-ospp-v42-5-perm-change-failed.rules
-    according to policy
+- name: Put contents into /etc/audit/rules.d/30-ospp-v42-5-perm-change-failed.rules according to policy
   ansible.builtin.copy:
     dest: /etc/audit/rules.d/30-ospp-v42-5-perm-change-failed.rules
     content: |
@@ -3594,8 +3529,7 @@
     - no_reboot_needed
     - restrict_strategy
 
-- name: Put contents into /etc/audit/rules.d/30-ospp-v42-5-perm-change-success.rules
-    according to policy
+- name: Put contents into /etc/audit/rules.d/30-ospp-v42-5-perm-change-success.rules according to policy
   ansible.builtin.copy:
     dest: /etc/audit/rules.d/30-ospp-v42-5-perm-change-success.rules
     content: |
@@ -3662,15 +3596,13 @@
 
 - name: Update the bootloader menu
   ansible.builtin.command: /usr/bin/grub2-editenv - set "{{ item }} random.trust_cpu=on"
-  with_items: '{{ kernelopts.stdout_lines | select(''match'', ''^kernelopts.*'') |
-    list }}'
+  with_items: "{{ kernelopts.stdout_lines | select('match', '^kernelopts.*') | list }}"
   when:
     - '"grub2-common" in ansible_facts.packages'
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - kernelopts.stdout_lines is defined
     - kernelopts.stdout_lines | length > 0
-    - kernelopts.stdout | regex_search('^kernelopts=(?:.*\s)?random.trust_cpu=on(?:\s.*)?$',
-      multiline=True) is none
+    - kernelopts.stdout | regex_search('^kernelopts=(?:.*\s)?random.trust_cpu=on(?:\s.*)?$', multiline=True) is none
   tags:
     - CCE-83314-5
     - grub2_kernel_trust_cpu_rng
@@ -3716,15 +3648,13 @@
 
 - name: Update the bootloader menu
   ansible.builtin.command: /usr/bin/grub2-editenv - set "{{ item }} pti=on"
-  with_items: '{{ kernelopts.stdout_lines | select(''match'', ''^kernelopts.*'') |
-    list }}'
+  with_items: "{{ kernelopts.stdout_lines | select('match', '^kernelopts.*') | list }}"
   when:
     - '"grub2-common" in ansible_facts.packages'
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - kernelopts.stdout_lines is defined
     - kernelopts.stdout_lines | length > 0
-    - kernelopts.stdout | regex_search('^kernelopts=(?:.*\s)?pti=on(?:\s.*)?$', multiline=True)
-      is none
+    - kernelopts.stdout | regex_search('^kernelopts=(?:.*\s)?pti=on(?:\s.*)?$', multiline=True) is none
   tags:
     - CCE-82194-2
     - DISA-STIG-RHEL-08-040004
@@ -3772,15 +3702,13 @@
 
 - name: Update the bootloader menu
   ansible.builtin.command: /usr/bin/grub2-editenv - set "{{ item }} vsyscall=none"
-  with_items: '{{ kernelopts.stdout_lines | select(''match'', ''^kernelopts.*'') |
-    list }}'
+  with_items: "{{ kernelopts.stdout_lines | select('match', '^kernelopts.*') | list }}"
   when:
     - '"grub2-common" in ansible_facts.packages'
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - kernelopts.stdout_lines is defined
     - kernelopts.stdout_lines | length > 0
-    - kernelopts.stdout | regex_search('^kernelopts=(?:.*\s)?vsyscall=none(?:\s.*)?$',
-      multiline=True) is none
+    - kernelopts.stdout | regex_search('^kernelopts=(?:.*\s)?vsyscall=none(?:\s.*)?$', multiline=True) is none
   tags:
     - CCE-80946-7
     - DISA-STIG-RHEL-08-010422
@@ -3794,24 +3722,22 @@
 
 - name: Ensure BLS boot entries options contain audit=1
   block:
-
-    - name: 'Check how many boot entries exist '
+    - name: "Check how many boot entries exist "
       ansible.builtin.find:
         paths: /boot/loader/entries/
-        patterns: '*.conf'
+        patterns: "*.conf"
       register: n_entries
 
     - name: Check how many boot entries set audit=1
       ansible.builtin.find:
         paths: /boot/loader/entries/
         contains: ^options .*audit=1.*$
-        patterns: '*.conf'
+        patterns: "*.conf"
       register: n_entries_options
 
     - name: Update boot entries options
       ansible.builtin.command: grubby --update-kernel=ALL --args="audit=1"
-      when: n_entries is defined and n_entries_options is defined and n_entries.matched
-        != n_entries_options.matched
+      when: n_entries is defined and n_entries_options is defined and n_entries.matched != n_entries_options.matched
 
     - name: Check if /etc/kernel/cmdline exists
       ansible.builtin.stat:
@@ -3838,8 +3764,7 @@
         backrefs: true
         regexp: ^(.*)$
         line: \1 audit=1
-      when: cmdline_stat is defined and cmdline_stat.stat.exists and cmdline_find
-        is defined and cmdline_find.matched == 0
+      when: cmdline_stat is defined and cmdline_stat.stat.exists and cmdline_find is defined and cmdline_find.matched == 0
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
     - CCE-83321-0
@@ -3852,24 +3777,22 @@
 
 - name: Ensure BLS boot entries options contain audit_backlog_limit=8192
   block:
-
-    - name: 'Check how many boot entries exist '
+    - name: "Check how many boot entries exist "
       ansible.builtin.find:
         paths: /boot/loader/entries/
-        patterns: '*.conf'
+        patterns: "*.conf"
       register: n_entries
 
     - name: Check how many boot entries set audit_backlog_limit=8192
       ansible.builtin.find:
         paths: /boot/loader/entries/
         contains: ^options .*audit_backlog_limit=8192.*$
-        patterns: '*.conf'
+        patterns: "*.conf"
       register: n_entries_options
 
     - name: Update boot entries options
       ansible.builtin.command: grubby --update-kernel=ALL --args="audit_backlog_limit=8192"
-      when: n_entries is defined and n_entries_options is defined and n_entries.matched
-        != n_entries_options.matched
+      when: n_entries is defined and n_entries_options is defined and n_entries.matched != n_entries_options.matched
 
     - name: Check if /etc/kernel/cmdline exists
       ansible.builtin.stat:
@@ -3896,8 +3819,7 @@
         backrefs: true
         regexp: ^(.*)$
         line: \1 audit_backlog_limit=8192
-      when: cmdline_stat is defined and cmdline_stat.stat.exists and cmdline_find
-        is defined and cmdline_find.matched == 0
+      when: cmdline_stat is defined and cmdline_stat.stat.exists and cmdline_find is defined and cmdline_find.matched == 0
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
     - CCE-83341-8
@@ -3910,7 +3832,6 @@
 
 - name: Ensure zIPL bootmap is up to date
   block:
-
     - name: Obtain stats of /boot/bootmap
       ansible.builtin.stat:
         path: /boot/bootmap
@@ -3924,8 +3845,7 @@
     - name: Update zIPL bootmap
       ansible.builtin.command: /usr/sbin/zipl
       changed_when: true
-      when: boot_bootmap.stat.mtime is defined and zipl_conf.stat.mtime is defined
-        and  boot_bootmap.stat.mtime < zipl_conf.stat.mtime
+      when: boot_bootmap.stat.mtime is defined and zipl_conf.stat.mtime is defined and  boot_bootmap.stat.mtime < zipl_conf.stat.mtime
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
     - CCE-83486-1
@@ -3938,24 +3858,22 @@
 
 - name: Ensure BLS boot entries options contain page_poison=1
   block:
-
-    - name: 'Check how many boot entries exist '
+    - name: "Check how many boot entries exist "
       ansible.builtin.find:
         paths: /boot/loader/entries/
-        patterns: '*.conf'
+        patterns: "*.conf"
       register: n_entries
 
     - name: Check how many boot entries set page_poison=1
       ansible.builtin.find:
         paths: /boot/loader/entries/
         contains: ^options .*page_poison=1.*$
-        patterns: '*.conf'
+        patterns: "*.conf"
       register: n_entries_options
 
     - name: Update boot entries options
       ansible.builtin.command: grubby --update-kernel=ALL --args="page_poison=1"
-      when: n_entries is defined and n_entries_options is defined and n_entries.matched
-        != n_entries_options.matched
+      when: n_entries is defined and n_entries_options is defined and n_entries.matched != n_entries_options.matched
 
     - name: Check if /etc/kernel/cmdline exists
       ansible.builtin.stat:
@@ -3982,8 +3900,7 @@
         backrefs: true
         regexp: ^(.*)$
         line: \1 page_poison=1
-      when: cmdline_stat is defined and cmdline_stat.stat.exists and cmdline_find
-        is defined and cmdline_find.matched == 0
+      when: cmdline_stat is defined and cmdline_stat.stat.exists and cmdline_find is defined and cmdline_find.matched == 0
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
     - CCE-83351-7
@@ -3996,24 +3913,22 @@
 
 - name: Ensure BLS boot entries options contain slub_debug=P
   block:
-
-    - name: 'Check how many boot entries exist '
+    - name: "Check how many boot entries exist "
       ansible.builtin.find:
         paths: /boot/loader/entries/
-        patterns: '*.conf'
+        patterns: "*.conf"
       register: n_entries
 
     - name: Check how many boot entries set slub_debug=P
       ansible.builtin.find:
         paths: /boot/loader/entries/
         contains: ^options .*slub_debug=P.*$
-        patterns: '*.conf'
+        patterns: "*.conf"
       register: n_entries_options
 
     - name: Update boot entries options
       ansible.builtin.command: grubby --update-kernel=ALL --args="slub_debug=P"
-      when: n_entries is defined and n_entries_options is defined and n_entries.matched
-        != n_entries_options.matched
+      when: n_entries is defined and n_entries_options is defined and n_entries.matched != n_entries_options.matched
 
     - name: Check if /etc/kernel/cmdline exists
       ansible.builtin.stat:
@@ -4040,8 +3955,7 @@
         backrefs: true
         regexp: ^(.*)$
         line: \1 slub_debug=P
-      when: cmdline_stat is defined and cmdline_stat.stat.exists and cmdline_find
-        is defined and cmdline_find.matched == 0
+      when: cmdline_stat is defined and cmdline_stat.stat.exists and cmdline_find is defined and cmdline_find.matched == 0
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
     - CCE-83371-5
@@ -4054,24 +3968,22 @@
 
 - name: Ensure BLS boot entries options contain vsyscall=none
   block:
-
-    - name: 'Check how many boot entries exist '
+    - name: "Check how many boot entries exist "
       ansible.builtin.find:
         paths: /boot/loader/entries/
-        patterns: '*.conf'
+        patterns: "*.conf"
       register: n_entries
 
     - name: Check how many boot entries set vsyscall=none
       ansible.builtin.find:
         paths: /boot/loader/entries/
         contains: ^options .*vsyscall=none.*$
-        patterns: '*.conf'
+        patterns: "*.conf"
       register: n_entries_options
 
     - name: Update boot entries options
       ansible.builtin.command: grubby --update-kernel=ALL --args="vsyscall=none"
-      when: n_entries is defined and n_entries_options is defined and n_entries.matched
-        != n_entries_options.matched
+      when: n_entries is defined and n_entries_options is defined and n_entries.matched != n_entries_options.matched
 
     - name: Check if /etc/kernel/cmdline exists
       ansible.builtin.stat:
@@ -4098,8 +4010,7 @@
         backrefs: true
         regexp: ^(.*)$
         line: \1 vsyscall=none
-      when: cmdline_stat is defined and cmdline_stat.stat.exists and cmdline_find
-        is defined and cmdline_find.matched == 0
+      when: cmdline_stat is defined and cmdline_stat.stat.exists and cmdline_find is defined and cmdline_find.matched == 0
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
     - CCE-83381-4
@@ -4159,7 +4070,6 @@
 
 - name: Enable service firewalld
   block:
-
     - name: Gather the package facts
       ansible.builtin.package_facts:
         manager: auto
@@ -4167,9 +4077,9 @@
     - name: Enable service firewalld
       ansible.builtin.service:
         name: firewalld
-        enabled: 'yes'
+        enabled: "yes"
         state: started
-        masked: 'no'
+        masked: "no"
       when:
         - '"firewalld" in ansible_facts.packages'
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4190,12 +4100,10 @@
     - no_reboot_needed
     - service_firewalld_enabled
 
-
-
 - name: Ensure sysctl net.ipv6.conf.all.accept_ra is set
   ansible.posix.sysctl:
     name: net.ipv6.conf.all.accept_ra
-    value: '{{ sysctl_net_ipv6_conf_all_accept_ra_value }}'
+    value: "{{ sysctl_net_ipv6_conf_all_accept_ra_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4213,12 +4121,10 @@
     - reboot_required
     - sysctl_net_ipv6_conf_all_accept_ra
 
-
-
 - name: Ensure sysctl net.ipv6.conf.all.accept_redirects is set
   ansible.posix.sysctl:
     name: net.ipv6.conf.all.accept_redirects
-    value: '{{ sysctl_net_ipv6_conf_all_accept_redirects_value }}'
+    value: "{{ sysctl_net_ipv6_conf_all_accept_redirects_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4238,12 +4144,10 @@
     - reboot_required
     - sysctl_net_ipv6_conf_all_accept_redirects
 
-
-
 - name: Ensure sysctl net.ipv6.conf.all.accept_source_route is set
   ansible.posix.sysctl:
     name: net.ipv6.conf.all.accept_source_route
-    value: '{{ sysctl_net_ipv6_conf_all_accept_source_route_value }}'
+    value: "{{ sysctl_net_ipv6_conf_all_accept_source_route_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4261,12 +4165,10 @@
     - reboot_required
     - sysctl_net_ipv6_conf_all_accept_source_route
 
-
-
 - name: Ensure sysctl net.ipv6.conf.default.accept_ra is set
   ansible.posix.sysctl:
     name: net.ipv6.conf.default.accept_ra
-    value: '{{ sysctl_net_ipv6_conf_default_accept_ra_value }}'
+    value: "{{ sysctl_net_ipv6_conf_default_accept_ra_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4284,12 +4186,10 @@
     - reboot_required
     - sysctl_net_ipv6_conf_default_accept_ra
 
-
-
 - name: Ensure sysctl net.ipv6.conf.default.accept_redirects is set
   ansible.posix.sysctl:
     name: net.ipv6.conf.default.accept_redirects
-    value: '{{ sysctl_net_ipv6_conf_default_accept_redirects_value }}'
+    value: "{{ sysctl_net_ipv6_conf_default_accept_redirects_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4307,12 +4207,10 @@
     - reboot_required
     - sysctl_net_ipv6_conf_default_accept_redirects
 
-
-
 - name: Ensure sysctl net.ipv6.conf.default.accept_source_route is set
   ansible.posix.sysctl:
     name: net.ipv6.conf.default.accept_source_route
-    value: '{{ sysctl_net_ipv6_conf_default_accept_source_route_value }}'
+    value: "{{ sysctl_net_ipv6_conf_default_accept_source_route_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4332,12 +4230,10 @@
     - reboot_required
     - sysctl_net_ipv6_conf_default_accept_source_route
 
-
-
 - name: Ensure sysctl net.ipv4.conf.all.accept_redirects is set
   ansible.posix.sysctl:
     name: net.ipv4.conf.all.accept_redirects
-    value: '{{ sysctl_net_ipv4_conf_all_accept_redirects_value }}'
+    value: "{{ sysctl_net_ipv4_conf_all_accept_redirects_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4357,12 +4253,10 @@
     - reboot_required
     - sysctl_net_ipv4_conf_all_accept_redirects
 
-
-
 - name: Ensure sysctl net.ipv4.conf.all.accept_source_route is set
   ansible.posix.sysctl:
     name: net.ipv4.conf.all.accept_source_route
-    value: '{{ sysctl_net_ipv4_conf_all_accept_source_route_value }}'
+    value: "{{ sysctl_net_ipv4_conf_all_accept_source_route_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4382,12 +4276,10 @@
     - reboot_required
     - sysctl_net_ipv4_conf_all_accept_source_route
 
-
-
 - name: Ensure sysctl net.ipv4.conf.all.log_martians is set
   ansible.posix.sysctl:
     name: net.ipv4.conf.all.log_martians
-    value: '{{ sysctl_net_ipv4_conf_all_log_martians_value }}'
+    value: "{{ sysctl_net_ipv4_conf_all_log_martians_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4404,12 +4296,10 @@
     - sysctl_net_ipv4_conf_all_log_martians
     - unknown_severity
 
-
-
 - name: Ensure sysctl net.ipv4.conf.all.rp_filter is set
   ansible.posix.sysctl:
     name: net.ipv4.conf.all.rp_filter
-    value: '{{ sysctl_net_ipv4_conf_all_rp_filter_value }}'
+    value: "{{ sysctl_net_ipv4_conf_all_rp_filter_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4428,12 +4318,10 @@
     - reboot_required
     - sysctl_net_ipv4_conf_all_rp_filter
 
-
-
 - name: Ensure sysctl net.ipv4.conf.all.secure_redirects is set
   ansible.posix.sysctl:
     name: net.ipv4.conf.all.secure_redirects
-    value: '{{ sysctl_net_ipv4_conf_all_secure_redirects_value }}'
+    value: "{{ sysctl_net_ipv4_conf_all_secure_redirects_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4451,12 +4339,10 @@
     - reboot_required
     - sysctl_net_ipv4_conf_all_secure_redirects
 
-
-
 - name: Ensure sysctl net.ipv4.conf.default.accept_redirects is set
   ansible.posix.sysctl:
     name: net.ipv4.conf.default.accept_redirects
-    value: '{{ sysctl_net_ipv4_conf_default_accept_redirects_value }}'
+    value: "{{ sysctl_net_ipv4_conf_default_accept_redirects_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4476,12 +4362,10 @@
     - reboot_required
     - sysctl_net_ipv4_conf_default_accept_redirects
 
-
-
 - name: Ensure sysctl net.ipv4.conf.default.accept_source_route is set
   ansible.posix.sysctl:
     name: net.ipv4.conf.default.accept_source_route
-    value: '{{ sysctl_net_ipv4_conf_default_accept_source_route_value }}'
+    value: "{{ sysctl_net_ipv4_conf_default_accept_source_route_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4501,12 +4385,10 @@
     - reboot_required
     - sysctl_net_ipv4_conf_default_accept_source_route
 
-
-
 - name: Ensure sysctl net.ipv4.conf.default.log_martians is set
   ansible.posix.sysctl:
     name: net.ipv4.conf.default.log_martians
-    value: '{{ sysctl_net_ipv4_conf_default_log_martians_value }}'
+    value: "{{ sysctl_net_ipv4_conf_default_log_martians_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4523,12 +4405,10 @@
     - sysctl_net_ipv4_conf_default_log_martians
     - unknown_severity
 
-
-
 - name: Ensure sysctl net.ipv4.conf.default.rp_filter is set
   ansible.posix.sysctl:
     name: net.ipv4.conf.default.rp_filter
-    value: '{{ sysctl_net_ipv4_conf_default_rp_filter_value }}'
+    value: "{{ sysctl_net_ipv4_conf_default_rp_filter_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4546,12 +4426,10 @@
     - reboot_required
     - sysctl_net_ipv4_conf_default_rp_filter
 
-
-
 - name: Ensure sysctl net.ipv4.conf.default.secure_redirects is set
   ansible.posix.sysctl:
     name: net.ipv4.conf.default.secure_redirects
-    value: '{{ sysctl_net_ipv4_conf_default_secure_redirects_value }}'
+    value: "{{ sysctl_net_ipv4_conf_default_secure_redirects_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4569,12 +4447,10 @@
     - reboot_required
     - sysctl_net_ipv4_conf_default_secure_redirects
 
-
-
 - name: Ensure sysctl net.ipv4.icmp_echo_ignore_broadcasts is set
   ansible.posix.sysctl:
     name: net.ipv4.icmp_echo_ignore_broadcasts
-    value: '{{ sysctl_net_ipv4_icmp_echo_ignore_broadcasts_value }}'
+    value: "{{ sysctl_net_ipv4_icmp_echo_ignore_broadcasts_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4593,12 +4469,10 @@
     - reboot_required
     - sysctl_net_ipv4_icmp_echo_ignore_broadcasts
 
-
-
 - name: Ensure sysctl net.ipv4.icmp_ignore_bogus_error_responses is set
   ansible.posix.sysctl:
     name: net.ipv4.icmp_ignore_bogus_error_responses
-    value: '{{ sysctl_net_ipv4_icmp_ignore_bogus_error_responses_value }}'
+    value: "{{ sysctl_net_ipv4_icmp_ignore_bogus_error_responses_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4615,12 +4489,10 @@
     - sysctl_net_ipv4_icmp_ignore_bogus_error_responses
     - unknown_severity
 
-
-
 - name: Ensure sysctl net.ipv4.tcp_syncookies is set
   ansible.posix.sysctl:
     name: net.ipv4.tcp_syncookies
-    value: '{{ sysctl_net_ipv4_tcp_syncookies_value }}'
+    value: "{{ sysctl_net_ipv4_tcp_syncookies_value }}"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4644,7 +4516,7 @@
 - name: Ensure sysctl net.ipv4.conf.all.send_redirects is set to 0
   ansible.posix.sysctl:
     name: net.ipv4.conf.all.send_redirects
-    value: '0'
+    value: "0"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4668,7 +4540,7 @@
 - name: Ensure sysctl net.ipv4.conf.default.send_redirects is set to 0
   ansible.posix.sysctl:
     name: net.ipv4.conf.default.send_redirects
-    value: '0'
+    value: "0"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4692,7 +4564,7 @@
 - name: Ensure sysctl net.ipv4.ip_forward is set to 0
   ansible.posix.sysctl:
     name: net.ipv4.ip_forward
-    value: '0'
+    value: "0"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4833,7 +4705,7 @@
 - name: Ensure sysctl fs.protected_hardlinks is set to 1
   ansible.posix.sysctl:
     name: fs.protected_hardlinks
-    value: '1'
+    value: "1"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4852,7 +4724,7 @@
 - name: Ensure sysctl fs.protected_symlinks is set to 1
   ansible.posix.sysctl:
     name: fs.protected_symlinks
-    value: '1'
+    value: "1"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4913,10 +4785,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -4938,15 +4810,15 @@
 
 - name: If /boot not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /boot
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -4969,8 +4841,7 @@
 
 - name: Make sure nodev option is part of the to /boot options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',nodev''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',nodev' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "nodev" not in mount_info.options
@@ -4992,14 +4863,13 @@
 - name: Ensure /boot is mounted with nodev option
   ansible.posix.mount:
     path: /boot
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-82941-6
     - NIST-800-53-AC-6
@@ -5040,10 +4910,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -5066,15 +4936,15 @@
 
 - name: If /boot not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /boot
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -5098,8 +4968,7 @@
 
 - name: Make sure nosuid option is part of the to /boot options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',nosuid''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',nosuid' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "nosuid" not in mount_info.options
@@ -5122,14 +4991,13 @@
 - name: Ensure /boot is mounted with nosuid option
   ansible.posix.mount:
     path: /boot
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-81033-3
     - DISA-STIG-RHEL-08-010571
@@ -5171,10 +5039,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -5197,7 +5065,7 @@
 
 - name: If /dev/shm not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
@@ -5229,8 +5097,7 @@
 
 - name: Make sure nodev option is part of the to /dev/shm options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',nodev''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',nodev' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "nodev" not in mount_info.options
@@ -5253,14 +5120,13 @@
 - name: Ensure /dev/shm is mounted with nodev option
   ansible.posix.mount:
     path: /dev/shm
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or (""
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("" | length == 0)
   tags:
     - CCE-80837-8
     - DISA-STIG-RHEL-08-040120
@@ -5302,10 +5168,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -5328,7 +5194,7 @@
 
 - name: If /dev/shm not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
@@ -5360,8 +5226,7 @@
 
 - name: Make sure noexec option is part of the to /dev/shm options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',noexec''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',noexec' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "noexec" not in mount_info.options
@@ -5384,14 +5249,13 @@
 - name: Ensure /dev/shm is mounted with noexec option
   ansible.posix.mount:
     path: /dev/shm
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or (""
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("" | length == 0)
   tags:
     - CCE-80838-6
     - DISA-STIG-RHEL-08-040122
@@ -5433,10 +5297,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -5459,7 +5323,7 @@
 
 - name: If /dev/shm not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
@@ -5491,8 +5355,7 @@
 
 - name: Make sure nosuid option is part of the to /dev/shm options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',nosuid''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',nosuid' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "nosuid" not in mount_info.options
@@ -5515,14 +5378,13 @@
 - name: Ensure /dev/shm is mounted with nosuid option
   ansible.posix.mount:
     path: /dev/shm
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or (""
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("" | length == 0)
   tags:
     - CCE-80839-4
     - DISA-STIG-RHEL-08-040121
@@ -5557,10 +5419,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -5576,15 +5438,15 @@
 
 - name: If /home not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /home
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -5601,8 +5463,7 @@
 
 - name: Make sure nodev option is part of the to /home options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',nodev''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',nodev' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "nodev" not in mount_info.options
@@ -5618,14 +5479,13 @@
 - name: Ensure /home is mounted with nodev option
   ansible.posix.mount:
     path: /home
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-81048-1
     - configure_strategy
@@ -5660,10 +5520,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -5686,15 +5546,15 @@
 
 - name: If /home not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /home
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -5718,8 +5578,7 @@
 
 - name: Make sure nosuid option is part of the to /home options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',nosuid''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',nosuid' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "nosuid" not in mount_info.options
@@ -5742,14 +5601,13 @@
 - name: Ensure /home is mounted with nosuid option
   ansible.posix.mount:
     path: /home
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-81050-7
     - DISA-STIG-RHEL-08-010570
@@ -5768,17 +5626,17 @@
 
 - name: Ensure non-root local partitions are mounted with nodev option
   ansible.posix.mount:
-    path: '{{ item.mount }}'
-    src: '{{ item.device }}'
-    opts: '{{ item.options }},nodev'
+    path: "{{ item.mount }}"
+    src: "{{ item.device }}"
+    opts: "{{ item.options }},nodev"
     state: mounted
-    fstype: '{{ item.fstype }}'
+    fstype: "{{ item.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - item.mount is match('/\w')
     - item.options is not search('nodev')
   with_items:
-    - '{{ ansible_facts.mounts }}'
+    - "{{ ansible_facts.mounts }}"
   tags:
     - CCE-82069-6
     - DISA-STIG-RHEL-08-010580
@@ -5820,10 +5678,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -5846,15 +5704,15 @@
 
 - name: If /tmp not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /tmp
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -5878,8 +5736,7 @@
 
 - name: Make sure nodev option is part of the to /tmp options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',nodev''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',nodev' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "nodev" not in mount_info.options
@@ -5902,14 +5759,13 @@
 - name: Ensure /tmp is mounted with nodev option
   ansible.posix.mount:
     path: /tmp
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-82623-0
     - DISA-STIG-RHEL-08-040123
@@ -5951,10 +5807,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -5977,15 +5833,15 @@
 
 - name: If /tmp not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /tmp
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -6009,8 +5865,7 @@
 
 - name: Make sure noexec option is part of the to /tmp options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',noexec''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',noexec' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "noexec" not in mount_info.options
@@ -6033,14 +5888,13 @@
 - name: Ensure /tmp is mounted with noexec option
   ansible.posix.mount:
     path: /tmp
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-82139-7
     - DISA-STIG-RHEL-08-040125
@@ -6082,10 +5936,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -6108,15 +5962,15 @@
 
 - name: If /tmp not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /tmp
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -6140,8 +5994,7 @@
 
 - name: Make sure nosuid option is part of the to /tmp options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',nosuid''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',nosuid' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "nosuid" not in mount_info.options
@@ -6164,14 +6017,13 @@
 - name: Ensure /tmp is mounted with nosuid option
   ansible.posix.mount:
     path: /tmp
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-82140-5
     - DISA-STIG-RHEL-08-040124
@@ -6213,10 +6065,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -6239,15 +6091,15 @@
 
 - name: If /var/log/audit not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /var/log/audit
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -6271,8 +6123,7 @@
 
 - name: Make sure nodev option is part of the to /var/log/audit options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',nodev''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',nodev' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "nodev" not in mount_info.options
@@ -6295,14 +6146,13 @@
 - name: Ensure /var/log/audit is mounted with nodev option
   ansible.posix.mount:
     path: /var/log/audit
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-82080-3
     - DISA-STIG-RHEL-08-040129
@@ -6344,10 +6194,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -6370,15 +6220,15 @@
 
 - name: If /var/log/audit not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /var/log/audit
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -6402,8 +6252,7 @@
 
 - name: Make sure noexec option is part of the to /var/log/audit options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',noexec''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',noexec' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "noexec" not in mount_info.options
@@ -6426,14 +6275,13 @@
 - name: Ensure /var/log/audit is mounted with noexec option
   ansible.posix.mount:
     path: /var/log/audit
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-82975-4
     - DISA-STIG-RHEL-08-040131
@@ -6475,10 +6323,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -6501,15 +6349,15 @@
 
 - name: If /var/log/audit not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /var/log/audit
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -6533,8 +6381,7 @@
 
 - name: Make sure nosuid option is part of the to /var/log/audit options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',nosuid''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',nosuid' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "nosuid" not in mount_info.options
@@ -6557,14 +6404,13 @@
 - name: Ensure /var/log/audit is mounted with nosuid option
   ansible.posix.mount:
     path: /var/log/audit
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-82921-8
     - DISA-STIG-RHEL-08-040130
@@ -6606,10 +6452,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -6632,15 +6478,15 @@
 
 - name: If /var/log not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /var/log
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -6664,8 +6510,7 @@
 
 - name: Make sure nodev option is part of the to /var/log options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',nodev''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',nodev' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "nodev" not in mount_info.options
@@ -6688,14 +6533,13 @@
 - name: Ensure /var/log is mounted with nodev option
   ansible.posix.mount:
     path: /var/log
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-82077-9
     - DISA-STIG-RHEL-08-040126
@@ -6737,10 +6581,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -6763,15 +6607,15 @@
 
 - name: If /var/log not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /var/log
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -6795,8 +6639,7 @@
 
 - name: Make sure noexec option is part of the to /var/log options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',noexec''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',noexec' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "noexec" not in mount_info.options
@@ -6819,14 +6662,13 @@
 - name: Ensure /var/log is mounted with noexec option
   ansible.posix.mount:
     path: /var/log
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-82008-4
     - DISA-STIG-RHEL-08-040128
@@ -6868,10 +6710,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -6894,15 +6736,15 @@
 
 - name: If /var/log not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /var/log
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -6926,8 +6768,7 @@
 
 - name: Make sure nosuid option is part of the to /var/log options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',nosuid''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',nosuid' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "nosuid" not in mount_info.options
@@ -6950,14 +6791,13 @@
 - name: Ensure /var/log is mounted with nosuid option
   ansible.posix.mount:
     path: /var/log
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-82065-4
     - DISA-STIG-RHEL-08-040127
@@ -6998,10 +6838,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -7023,15 +6863,15 @@
 
 - name: If /var not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /var
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -7054,8 +6894,7 @@
 
 - name: Make sure nodev option is part of the to /var options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',nodev''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',nodev' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "nodev" not in mount_info.options
@@ -7077,14 +6916,13 @@
 - name: Ensure /var is mounted with nodev option
   ansible.posix.mount:
     path: /var
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-82062-1
     - NIST-800-53-AC-6
@@ -7119,10 +6957,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -7139,15 +6977,15 @@
 
 - name: If /var/tmp not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /var/tmp
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -7165,8 +7003,7 @@
 
 - name: Make sure nodev option is part of the to /var/tmp options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',nodev''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',nodev' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "nodev" not in mount_info.options
@@ -7183,14 +7020,13 @@
 - name: Ensure /var/tmp is mounted with nodev option
   ansible.posix.mount:
     path: /var/tmp
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-82068-8
     - DISA-STIG-RHEL-08-040132
@@ -7220,10 +7056,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -7240,15 +7076,15 @@
 
 - name: If /var/tmp not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /var/tmp
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -7266,8 +7102,7 @@
 
 - name: Make sure noexec option is part of the to /var/tmp options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',noexec''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',noexec' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "noexec" not in mount_info.options
@@ -7284,14 +7119,13 @@
 - name: Ensure /var/tmp is mounted with noexec option
   ansible.posix.mount:
     path: /var/tmp
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-82151-2
     - DISA-STIG-RHEL-08-040134
@@ -7321,10 +7155,10 @@
 
 - name: Create mount_info dictionary variable
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
-    - '{{ device_name.stdout_lines[0].split() | list | lower }}'
-    - '{{ device_name.stdout_lines[1].split() | list }}'
+    - "{{ device_name.stdout_lines[0].split() | list | lower }}"
+    - "{{ device_name.stdout_lines[1].split() | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - device_name.stdout is defined and device_name.stdout_lines is defined
@@ -7341,15 +7175,15 @@
 
 - name: If /var/tmp not mounted, craft mount_info manually
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info|default({})|combine({item.0: item.1}) }}'
+    mount_info: "{{ mount_info|default({})|combine({item.0: item.1}) }}"
   with_together:
     - - target
       - source
       - fstype
       - options
     - - /var/tmp
-      - ''
-      - ''
+      - ""
+      - ""
       - defaults
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -7367,8 +7201,7 @@
 
 - name: Make sure nosuid option is part of the to /var/tmp options
   ansible.builtin.set_fact:
-    mount_info: '{{ mount_info | combine( {''options'':''''~mount_info.options~'',nosuid''
-      }) }}'
+    mount_info: "{{ mount_info | combine( {'options':''~mount_info.options~',nosuid' }) }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - mount_info is defined and "nosuid" not in mount_info.options
@@ -7385,14 +7218,13 @@
 - name: Ensure /var/tmp is mounted with nosuid option
   ansible.posix.mount:
     path: /var/tmp
-    src: '{{ mount_info.source }}'
-    opts: '{{ mount_info.options }}'
+    src: "{{ mount_info.source }}"
+    opts: "{{ mount_info.options }}"
     state: mounted
-    fstype: '{{ mount_info.fstype }}'
+    fstype: "{{ mount_info.fstype }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
-    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab"
-      | length == 0)
+    - (device_name.stdout is defined and (device_name.stdout | length > 0)) or ("--fstab" | length == 0)
   tags:
     - CCE-82154-6
     - DISA-STIG-RHEL-08-040133
@@ -7406,7 +7238,7 @@
 - name: Ensure sysctl kernel.core_pattern is set to |/bin/false
   ansible.posix.sysctl:
     name: kernel.core_pattern
-    value: '|/bin/false'
+    value: "|/bin/false"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -7423,7 +7255,7 @@
 - name: Ensure sysctl kernel.dmesg_restrict is set to 1
   ansible.posix.sysctl:
     name: kernel.dmesg_restrict
-    value: '1'
+    value: "1"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -7443,7 +7275,7 @@
 - name: Ensure sysctl kernel.kexec_load_disabled is set to 1
   ansible.posix.sysctl:
     name: kernel.kexec_load_disabled
-    value: '1'
+    value: "1"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -7460,7 +7292,7 @@
 - name: Ensure sysctl kernel.perf_event_paranoid is set to 2
   ansible.posix.sysctl:
     name: kernel.perf_event_paranoid
-    value: '2'
+    value: "2"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -7477,7 +7309,7 @@
 - name: Ensure sysctl kernel.unprivileged_bpf_disabled is set to 1
   ansible.posix.sysctl:
     name: kernel.unprivileged_bpf_disabled
-    value: '1'
+    value: "1"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -7494,7 +7326,7 @@
 - name: Ensure sysctl kernel.yama.ptrace_scope is set to 1
   ansible.posix.sysctl:
     name: kernel.yama.ptrace_scope
-    value: '1'
+    value: "1"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -7511,7 +7343,7 @@
 - name: Ensure sysctl net.core.bpf_jit_harden is set to 2
   ansible.posix.sysctl:
     name: net.core.bpf_jit_harden
-    value: '2'
+    value: "2"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -7529,7 +7361,7 @@
 - name: Ensure sysctl user.max_user_namespaces is set to 0
   ansible.posix.sysctl:
     name: user.max_user_namespaces
-    value: '0'
+    value: "0"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -7547,16 +7379,15 @@
 
 - name: Disable service systemd-coredump
   block:
-
     - name: Gather the service facts
-      ansible.builtin.service_facts: null
+      ansible.builtin.service_facts:
 
     - name: Disable service systemd-coredump
       ansible.builtin.systemd:
         name: systemd-coredump.service
-        enabled: 'no'
+        enabled: "no"
         state: stopped
-        masked: 'yes'
+        masked: "yes"
       when: '"systemd-coredump.service" in ansible_facts.services'
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
@@ -7589,9 +7420,9 @@
 - name: Disable socket systemd-coredump
   ansible.builtin.systemd:
     name: systemd-coredump.socket
-    enabled: 'no'
+    enabled: "no"
     state: stopped
-    masked: 'yes'
+    masked: "yes"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - '"systemd-coredump.socket" in socket_file_exists.stdout_lines[1]'
@@ -7607,7 +7438,6 @@
 
 - name: Disable core dump backtraces
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/systemd/coredump.conf
@@ -7645,7 +7475,6 @@
 
 - name: Disable storing core dump
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/systemd/coredump.conf
@@ -7698,7 +7527,7 @@
   ansible.builtin.lineinfile:
     dest: /etc/security/limits.conf
     regexp: ^[^#].*core
-    line: '*        hard       core      0'
+    line: "*        hard       core      0"
     create: true
   when: '"pam" in ansible_facts.packages'
   tags:
@@ -7714,7 +7543,7 @@
 - name: Ensure sysctl kernel.kptr_restrict is set to 1
   ansible.posix.sysctl:
     name: kernel.kptr_restrict
-    value: '1'
+    value: "1"
     state: present
     reload: true
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -7768,15 +7597,13 @@
 
 - name: Update the bootloader menu
   ansible.builtin.command: /usr/bin/grub2-editenv - set "{{ item }} page_poison=1"
-  with_items: '{{ kernelopts.stdout_lines | select(''match'', ''^kernelopts.*'') |
-    list }}'
+  with_items: "{{ kernelopts.stdout_lines | select('match', '^kernelopts.*') | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - '"grub2-common" in ansible_facts.packages'
     - kernelopts.stdout_lines is defined
     - kernelopts.stdout_lines | length > 0
-    - kernelopts.stdout | regex_search('^kernelopts=(?:.*\s)?page_poison=1(?:\s.*)?$',
-      multiline=True) is none
+    - kernelopts.stdout | regex_search('^kernelopts=(?:.*\s)?page_poison=1(?:\s.*)?$', multiline=True) is none
   tags:
     - CCE-80944-2
     - DISA-STIG-RHEL-08-010421
@@ -7824,15 +7651,13 @@
 
 - name: Update the bootloader menu
   ansible.builtin.command: /usr/bin/grub2-editenv - set "{{ item }} slub_debug=P"
-  with_items: '{{ kernelopts.stdout_lines | select(''match'', ''^kernelopts.*'') |
-    list }}'
+  with_items: "{{ kernelopts.stdout_lines | select('match', '^kernelopts.*') | list }}"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - '"grub2-common" in ansible_facts.packages'
     - kernelopts.stdout_lines is defined
     - kernelopts.stdout_lines | length > 0
-    - kernelopts.stdout | regex_search('^kernelopts=(?:.*\s)?slub_debug=P(?:\s.*)?$',
-      multiline=True) is none
+    - kernelopts.stdout | regex_search('^kernelopts=(?:.*\s)?slub_debug=P(?:\s.*)?$', multiline=True) is none
   tags:
     - CCE-80945-9
     - DISA-STIG-RHEL-08-010423
@@ -7873,11 +7698,8 @@
     - no_reboot_needed
     - package_policycoreutils_installed
 
-
-
 - name: Configure SELinux Policy
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/selinux/config
@@ -7920,11 +7742,8 @@
     - restrict_strategy
     - selinux_policytype
 
-
-
 - name: Ensure SELinux State is Enforcing
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/selinux/config
@@ -7983,16 +7802,15 @@
 
 - name: Disable service kdump
   block:
-
     - name: Gather the service facts
-      ansible.builtin.service_facts: null
+      ansible.builtin.service_facts:
 
     - name: Disable service kdump
       ansible.builtin.systemd:
         name: kdump.service
-        enabled: 'no'
+        enabled: "no"
         state: stopped
-        masked: 'yes'
+        masked: "yes"
       when: '"kdump.service" in ansible_facts.services'
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
@@ -8031,9 +7849,9 @@
 - name: Disable socket kdump
   ansible.builtin.systemd:
     name: kdump.socket
-    enabled: 'no'
+    enabled: "no"
     state: stopped
-    masked: 'yes'
+    masked: "yes"
   when:
     - ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
     - '"kdump.socket" in socket_file_exists.stdout_lines[1]'
@@ -8069,7 +7887,6 @@
 
 - name: Enable service fapolicyd
   block:
-
     - name: Gather the package facts
       ansible.builtin.package_facts:
         manager: auto
@@ -8077,9 +7894,9 @@
     - name: Enable service fapolicyd
       ansible.builtin.service:
         name: fapolicyd
-        enabled: 'yes'
+        enabled: "yes"
         state: started
-        masked: 'no'
+        masked: "no"
       when:
         - '"fapolicyd" in ansible_facts.packages'
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
@@ -8170,9 +7987,6 @@
     - no_reboot_needed
     - package_openssh-server_installed
 
-
-
-
 - name: Ensure RekeyLimit is not configured in /etc/ssh/ssh_config
   ansible.builtin.lineinfile:
     path: /etc/ssh/ssh_config
@@ -8193,7 +8007,7 @@
   ansible.builtin.find:
     paths: /etc/ssh/ssh_config.d/
     contains: ^[\s]*RekeyLimit.*$
-    patterns: '*.config'
+    patterns: "*.config"
   register: ssh_config_include_files
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
@@ -8205,13 +8019,12 @@
     - no_reboot_needed
     - ssh_client_rekey_limit
 
-- name: Remove all occurences of RekeyLimit configuration from include config files
-    of ssh client
+- name: Remove all occurences of RekeyLimit configuration from include config files of ssh client
   ansible.builtin.lineinfile:
-    path: '{{ item }}'
+    path: "{{ item }}"
     regexp: ^[\s]*RekeyLimit.*$
     state: absent
-  loop: '{{ ssh_config_include_files.files }}'
+  loop: "{{ ssh_config_include_files.files }}"
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
     - CCE-82880-6
@@ -8222,14 +8035,12 @@
     - no_reboot_needed
     - ssh_client_rekey_limit
 
-- name: Ensure that rekey limit is set to {{ var_ssh_client_rekey_limit_size }} {{
-    var_ssh_client_rekey_limit_time }} in /etc/ssh/ssh_config.d/02-rekey-limit.conf
+- name: Ensure that rekey limit is set to {{ var_ssh_client_rekey_limit_size }} {{ var_ssh_client_rekey_limit_time }} in /etc/ssh/ssh_config.d/02-rekey-limit.conf
   ansible.builtin.lineinfile:
     path: /etc/ssh/ssh_config.d/02-rekey-limit.conf
     create: true
     regexp: ^\s*RekeyLimit.*$
-    line: RekeyLimit {{ var_ssh_client_rekey_limit_size }} {{ var_ssh_client_rekey_limit_time
-      }}
+    line: RekeyLimit {{ var_ssh_client_rekey_limit_size }} {{ var_ssh_client_rekey_limit_time }}
     state: present
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
   tags:
@@ -8307,7 +8118,6 @@
 
 - name: Disable Host-Based Authentication
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
@@ -8354,7 +8164,6 @@
 
 - name: Disable SSH Access via Empty Passwords
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
@@ -8402,7 +8211,6 @@
 
 - name: Disable GSSAPI Authentication
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
@@ -8448,7 +8256,6 @@
 
 - name: Disable Kerberos Authentication
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
@@ -8494,7 +8301,6 @@
 
 - name: Disable SSH Root Login
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
@@ -8546,7 +8352,6 @@
 
 - name: Enable Use of Strict Mode Checking
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
@@ -8591,7 +8396,6 @@
 
 - name: Enable SSH Warning Banner
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
@@ -8636,12 +8440,8 @@
     - restrict_strategy
     - sshd_enable_warning_banner
 
-
-
-
 - name: Force frequent session key renegotiation
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
@@ -8680,11 +8480,8 @@
     - no_reboot_needed
     - sshd_rekey_limit
 
-
-
 - name: Set SSH Idle Timeout Interval
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
@@ -8735,7 +8532,6 @@
 
 - name: Set SSH Client Alive Count Max to zero
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/ssh/sshd_config
@@ -8782,10 +8578,8 @@
     - restrict_strategy
     - sshd_set_keepalive_0
 
-- name: Setting unquoted shell-style assignment of 'SSH_USE_STRONG_RNG' to '32' in
-    '/etc/sysconfig/sshd'
+- name: Setting unquoted shell-style assignment of 'SSH_USE_STRONG_RNG' to '32' in '/etc/sysconfig/sshd'
   block:
-
     - name: Check for duplicate values
       ansible.builtin.lineinfile:
         path: /etc/sysconfig/sshd
@@ -8840,7 +8634,6 @@
 
 - name: Enable service usbguard
   block:
-
     - name: Gather the package facts
       ansible.builtin.package_facts:
         manager: auto
@@ -8848,9 +8641,9 @@
     - name: Enable service usbguard
       ansible.builtin.service:
         name: usbguard
-        enabled: 'yes'
+        enabled: "yes"
         state: started
-        masked: 'no'
+        masked: "no"
       when:
         - '"usbguard" in ansible_facts.packages'
   when: ansible_virtualization_type not in ["docker", "lxc", "openvz", "podman", "container"]
