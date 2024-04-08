@@ -1,7 +1,6 @@
 ---
 - name: Block for cert Check
   block:
-
     - name: Get the cert from a port
       community.crypto.get_certificate:
         host: "{{ inventory_hostname }}"
@@ -17,7 +16,6 @@
         expired: "{{ cert.expired }}"
 
   rescue:
-
     - name: Display error
       ansible.builtin.debug:
         msg: "{{ cert.msg }}"

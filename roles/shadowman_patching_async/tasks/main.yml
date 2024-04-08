@@ -1,7 +1,7 @@
 ---
 - name: Patch Server
   ansible.builtin.yum:
-    name: '*'
+    name: "*"
     state: latest
     update_only: true
   async: 1000

@@ -3,8 +3,8 @@
   community.vmware.vmware_vm_info:
     validate_certs: false
     show_tag: true
-    folder: "/Shadowman/vm/Discovered virtual machine"
-    vm_type: "vm"
+    folder: /Shadowman/vm/Discovered virtual machine
+    vm_type: vm
   register: vmware_info
 
 - name: Get Azure VM Info
@@ -13,7 +13,7 @@
 
 - name: Get AWS regions
   amazon.aws.aws_region_info:
-    region: "us-east-2"
+    region: us-east-2
   register: allregions
 
 - name: Get AWS VM Info

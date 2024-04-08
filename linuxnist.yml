@@ -4,7 +4,6 @@
   strategy: free
 
   tasks:
-
     - name: NIST Compliance RHEL7
       ansible.builtin.include_role:
         name: shadowman_nist_rhel7

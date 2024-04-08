@@ -1,6 +1,6 @@
 ---
-acceptlist: ''
-rejectlist: ''
-categories: '*'
+acceptlist: ""
+rejectlist: ""
+categories: "*"
 exclude_packages: "{{ exclude.split(',') }}"
-exclude: ''
+exclude: ""

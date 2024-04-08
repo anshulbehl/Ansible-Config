@@ -12,13 +12,12 @@
     builder_compose_customizations:
       user:
         name: "{{ builder_user }}"
-        description: "builder user"
+        description: builder user
         password: "{{ builder_password }}"
-        groups: ["users", "wheel"]
+        groups: [users, wheel]
       services:
-        enabled: ["httpd", "sshd"]
+        enabled: [httpd, sshd]
       firewalld.services:
-        enabled: ["ssh", "https"]
-
+        enabled: [ssh, https]
   roles:
     - infra.osbuild.builder

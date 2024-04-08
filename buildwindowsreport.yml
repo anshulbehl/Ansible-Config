@@ -2,7 +2,6 @@
 - name: Create Windows Report
   hosts: all
   tasks:
-
     - name: Scan Systems for detailed report
       ansible.builtin.include_role:
         name: shadowman_scan_systems

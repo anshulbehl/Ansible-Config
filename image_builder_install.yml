@@ -3,7 +3,6 @@
   hosts: all
 
   tasks:
-
     - name: Run the role to install image builder
       ansible.builtin.import_role:
         name: infra.osbuild.setup_server
